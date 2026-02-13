@@ -41,7 +41,7 @@ if (data.notification_type === "ToolPermission") {
   // process.exit(0);
   title = "unknown";
 }
-message = "eventName: " + eventName + " data.tool: " + data.tool + " data.tool.name: " + data.tool.name + + "data.tool_name: " + data.tool_name + " data.notification_type: " + data.notification_type;
+message = `eventName: ${eventName} data.tool: ${data.tool} data.tool.name: ${data.tool.name} data.tool_name: ${data.tool_name} data.notification_type: ${data.notification_type}`;
 
 
 
