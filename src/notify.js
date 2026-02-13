@@ -15,13 +15,35 @@ try {
   process.exit(0);
 }
 
-// Only handle ToolPermission for now
-if (data.notification_type !== "ToolPermission") {
-  process.exit(0);
-}
+const eventName = data.hook_event_name;
+let message = data.message || "Gemini Agent requires attention";
+let title = "Gemini CLI";
 
-const message = data.message || "Gemini Agent requires attention";
-const title = "Gemini CLI";
+// Identify event type
+if (data.notification_type === "ToolPermission") {
+  title = "Permission Required";
+  message = data.message || "Gemini needs permission to run a tool.";
+  sound = "Hero";
+} else if (eventName === "BeforeTool" || (data.tool && data.tool.name)) {
+  const toolName = data.tool_name || (data.tool && data.tool.name);
+  if (toolName === "ask_user") {
+    title = "Gemini Question";
+    message = "Gemini has a question for you.";
+    sound = "Bottle";
+  } else {
+    // process.exit(0);
+  }
+} else if (eventName === "AfterAgent" || data.hasOwnProperty("prompt_response")) {
+  title = "Task Finished";
+  message = "Gemini has finished the turn.";
+  sound = "Glass";
+} else {
+  // process.exit(0);
+  title = "unknown";
+}
+message = "eventName: " + eventName + " data.tool: " + data.tool + " data.tool.name: " + data.tool.name + + "data.tool_name: " + data.tool_name + " data.notification_type: " + data.notification_type;
+
+
 
 // Orchestration Logic
 // 1. Try Terminal Native
