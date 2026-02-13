@@ -13,19 +13,6 @@
         ]
       }
     ],
-    "BeforeTool": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "name": "notify-ask-user",
-            "type": "command",
-            "command": "node ${extensionPath}/src/notify.js",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
     "AfterAgent": [
       {
         "matcher": ".*",

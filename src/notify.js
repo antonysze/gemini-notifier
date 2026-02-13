@@ -16,32 +16,23 @@ try {
 }
 
 const eventName = data.hook_event_name;
-let message = data.message || "Gemini Agent requires attention";
 let title = "Gemini CLI";
+let message = data.message || "Gemini Agent requires attention";
 
 // Identify event type
-if (data.notification_type === "ToolPermission") {
-  title = "Permission Required";
+if (eventName === "AfterAgent")
+{
+  message = data.message || "Task Finished!";
+  sound = "Glass";
+}
+else if (eventName === "Notification" && data.notification_type === "ToolPermission") {
   message = data.message || "Gemini needs permission to run a tool.";
   sound = "Hero";
-} else if (eventName === "BeforeTool" || (data.tool && data.tool.name)) {
-  const toolName = data.tool_name || (data.tool && data.tool.name);
-  if (toolName === "ask_user") {
-    title = "Gemini Question";
-    message = "Gemini has a question for you.";
-    sound = "Bottle";
-  } else {
-    // process.exit(0);
-  }
-} else if (eventName === "AfterAgent" || data.hasOwnProperty("prompt_response")) {
-  title = "Task Finished";
-  message = "Gemini has finished the turn.";
-  sound = "Glass";
 } else {
-  // process.exit(0);
-  title = "unknown";
+  title = "Gemini CLI | Unknown event";
+  message = `eventName: ${eventName} data.notification_type: ${data.notification_type} data.message: ${data.message}`;
 }
-message = `eventName: ${eventName} data.tool: ${data.tool} data.tool.name: ${data.tool.name} data.tool_name: ${data.tool_name} data.notification_type: ${data.notification_type}`;
+
 
 
 
@@ -52,7 +43,7 @@ message = `eventName: ${eventName} data.tool: ${data.tool} data.tool.name: ${dat
 async function notify() {
   const terminalSuccess = await tryTerminalNotification(title, message);
   if (!terminalSuccess) {
-    await tryOSNotification(title, message);
+    await tryOSNotification(title, message, sound);
   }
 }
 
@@ -84,11 +75,11 @@ async function tryTerminalNotification(title, message) {
   return false;
 }
 
-async function tryOSNotification(title, message) {
+async function tryOSNotification(title, message, sound) {
   const platform = process.platform;
 
   if (platform === "darwin") {
-    return notifyMacOS(title, message);
+    return notifyMacOS(title, message, sound);
   } else if (platform === "linux") {
     return notifyLinux(title, message);
   }
@@ -96,7 +87,7 @@ async function tryOSNotification(title, message) {
   return false;
 }
 
-function notifyMacOS(title, message) {
+function notifyMacOS(title, message, sound) {
   return new Promise((resolve) => {
     // Check for osascript
     exec("which osascript", (err) => {
@@ -106,7 +97,7 @@ function notifyMacOS(title, message) {
       const safeTitle = title.replace(/"/g, '\\"');
       const safeMessage = message.replace(/"/g, '\\"');
 
-      const script = `display notification "${safeMessage}" with title "${safeTitle}"`;
+      const script = `display notification "${safeMessage}" with title "${safeTitle}" sound name "${sound}"`;
 
       exec(`osascript -e '${script}'`, (err) => {
         if (err) resolve(false);
