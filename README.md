@@ -31,7 +31,7 @@ If the terminal is not detected or supported, the extension attempts to use OS u
 This extension is typically installed via the Gemini CLI extensions manager.
 
 ```bash
-gemini extensions install https://github.com/thoreinstein/gemini-notifier
+gemini extensions install https://github.com/antonysze/gemini-notifier
 # OR linked locally
 gemini extensions link .
 ```
